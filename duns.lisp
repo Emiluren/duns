@@ -162,3 +162,65 @@
         (add-force particle
                    (scale-vec (normalize velocity)
                               (- drag-coeff)))))))
+
+(defun spring-force (pos1 pos2 spring-constant rest-length)
+  (let* ((distance (sub-vec pos1 pos2))
+         (mag (* (abs (- (magnitude distance) rest-length))
+                 spring-constant
+                 -1)))
+    (scale-vec (normalize distance) mag)))
+
+(defun particle-spring (other spring-constant rest-length)
+  (lambda (particle duration)
+    (declare (ignore duration))
+    (add-force particle
+               (spring-force (particle-position particle)
+                             (particle-position other)
+                             spring-constant
+                             rest-length))))
+
+(defun particle-anchored-spring (anchor spring-constant rest-length)
+  (lambda (particle duration)
+    (declare (ignore duration))
+    (add-force particle
+               (spring-force (particle-position particle)
+                             anchor
+                             spring-constant
+                             rest-length))))
+
+(defun particle-buoyancy (max-depth volume water-height
+                          &optional (liquid-density 1000))
+  (lambda (particle duration)
+    (declare (ignore duration))
+    (destructuring-bind (x y z) (particle-position particle)
+      (declare (ignore x z))
+      (let ((depth y))
+        (add-force particle
+                   (list 0
+                         (if (>= depth (+ water-height max-depth))
+                             (* liquid-density volume)
+                             (* liquid-density
+                                volume
+                                (/ (- depth max-depth water-height) 2)
+                                max-depth))
+                         0))))))
+
+(defun particle-fake-spring (anchor spring-constant damping)
+  (lambda (particle duration)
+    (when (has-finite-mass particle)
+      (let ((delta-position (sub-vec (particle-position particle)
+                                     anchor))
+            (gamma (* 0.5 (sqrt (- (* 4 spring-constant)
+                                   (* damping damping))))))
+        (when (not (zerop gamma))
+          (let* ((c (add-vec (scale-vec delta-position (/ damping 2 gamma))
+                             (scale-vec (velocity particle) (/ 1 gamma))))
+                 (target (scale-vec
+                          (add-vec (scale-vec delta-position
+                                              (cos (* gamma duration)))
+                                   (scale-vec c (sin (* gamma duration))))
+                          (exp (* -0.5 duration damping))))
+                 (accel (sub-vec (scale-vec (sub-vec target delta-position)
+                                            (/ 1 (* duration duration)))
+                                 (scale-vec (velocity particle) duration))))
+            (add-force particle (scale-vec accel (mass particle)))))))))
