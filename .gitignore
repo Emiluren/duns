@@ -1,2 +1,3 @@
-*.fasl
-*~
+/target
+**/*.rs.bk
+Cargo.lock
