@@ -28,14 +28,21 @@ impl Particle {
         self.inverse_mass = 1. / mass;
     }
 
-    pub fn integrate(&mut self, duration: f32) {
-        self.position += self.velocity * duration;
+    pub fn mass(&self) -> f32 {
+        1. / self.inverse_mass
+    }
 
+    pub fn integrate(&mut self, duration: f32) {
+        assert!(duration > 0.);
+
+        self.position += self.velocity * duration;
         let acceleration = self.acceleration +
             self.accumulated_force * self.inverse_mass;
-
         self.velocity += acceleration * duration;
 
+        // Impose drag
         self.velocity *= self.damping.powf(duration);
+
+        self.accumulated_force = vec3(0., 0., 0.);
     }
 }
