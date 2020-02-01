@@ -1,4 +1,5 @@
 pub mod particle;
+pub mod particle_contact;
 pub mod particle_force_generator;
 pub mod vec3;
 
