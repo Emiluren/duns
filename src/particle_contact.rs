@@ -101,7 +101,7 @@ impl ParticleContactResolver {
 
     pub fn resolve_contacts(
         &mut self,
-        contacts: &[&ParticleContact],
+        contacts: &[ParticleContact],
         duration: f32,
         particles: &mut ParticleMap
     ) {
@@ -128,9 +128,6 @@ impl ParticleContactResolver {
 pub trait ParticleContactGenerator {
     fn add_contact(
         &self,
-        p1: ParticleKey,
-        p2: ParticleKey,
-        limit: usize,
         particles: &ParticleMap
     ) -> Option<ParticleContact>;
 }
@@ -151,9 +148,6 @@ impl ParticleLink {
 impl ParticleContactGenerator for ParticleLink {
     fn add_contact(
         &self,
-        p1: ParticleKey,
-        p2: ParticleKey,
-        _limit: usize,
         particles: &ParticleMap
     ) -> Option<ParticleContact> {
         let length = self.current_length(particles);
@@ -166,8 +160,8 @@ impl ParticleContactGenerator for ParticleLink {
             (particles[self.p2].position - particles[self.p1].position).normalize();
 
         Some(ParticleContact {
-            p1: p1,
-            p2_opt: Some(p2),
+            p1: self.p1,
+            p2_opt: Some(self.p2),
             restitution: self.restitution,
             contact_normal: normal,
             penetration: length - self.max_length,
@@ -190,9 +184,6 @@ impl ParticleRod {
 impl ParticleContactGenerator for ParticleRod {
     fn add_contact(
         &self,
-        p1: ParticleKey,
-        p2: ParticleKey,
-        _limit: usize,
         particles: &ParticleMap
     ) -> Option<ParticleContact> {
         let current_length = self.current_length(particles);
@@ -211,8 +202,8 @@ impl ParticleContactGenerator for ParticleRod {
         };
 
         Some(ParticleContact {
-            p1: p1,
-            p2_opt: Some(p2),
+            p1: self.p1,
+            p2_opt: Some(self.p2),
             restitution: 0.,
             contact_normal: normal,
             penetration: penetration,
