@@ -1,5 +1,3 @@
-use std::cell::RefCell;
-
 use crate::particle::{Particle, ParticleKey, ParticleMap};
 use crate::vec3::{Vec3, vec3};
 
@@ -130,23 +128,23 @@ impl ParticleForceGenerator for ParticleAnchoredSpring {
     }
 }
 
-pub struct ParticleBungee<'a> {
-    pub other: &'a RefCell<Particle>,
+pub struct ParticleBungee {
+    pub other: ParticleKey,
     pub spring_constant: f32,
     pub rest_length: f32,
 }
 
-impl<'a> ParticleBungee<'a> {
-    pub fn new(other: &'a RefCell<Particle>, spring_constant: f32, rest_length: f32) -> Self {
+impl ParticleBungee {
+    pub fn new(other: ParticleKey, spring_constant: f32, rest_length: f32) -> Self {
         ParticleBungee { other, spring_constant, rest_length }
     }
 }
 
-impl ParticleForceGenerator for ParticleBungee<'_> {
+impl ParticleForceGenerator for ParticleBungee {
     fn update_force(&self, particle_key: ParticleKey, _duration: f32, particles: &mut ParticleMap) {
+        let other_pos = particles[self.other].position;
         let particle = particles.get_mut(particle_key).unwrap();
-        let other = self.other.borrow();
-        let to_other = particle.position - other.position;
+        let to_other = particle.position - other_pos;
         let dist = to_other.norm();
 
         if dist <= self.rest_length {
