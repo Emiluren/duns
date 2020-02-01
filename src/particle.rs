@@ -1,5 +1,7 @@
 use crate::vec3::{vec3, Vec3};
 
+use slotmap::{DenseSlotMap, new_key_type};
+
 #[derive(Clone)]
 pub struct Particle {
     pub position: Vec3,
@@ -10,6 +12,12 @@ pub struct Particle {
     pub damping: f32,
     pub inverse_mass: f32,
 }
+
+new_key_type! {
+    pub struct ParticleKey;
+}
+
+pub type ParticleMap = DenseSlotMap<ParticleKey, Particle>;
 
 impl Particle {
     pub fn new() -> Self {

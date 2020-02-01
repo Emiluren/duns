@@ -1,23 +1,29 @@
 use std::cell::RefCell;
 
-use crate::particle::Particle;
+use crate::particle::{Particle, ParticleKey, ParticleMap};
 use crate::vec3::{Vec3, vec3};
 
 pub trait ParticleForceGenerator {
-    fn update_force(&self, particle: &mut Particle, duration: f32);
+    fn update_force(
+        &self,
+        particle_key: ParticleKey,
+        duration: f32,
+        particles: &mut ParticleMap
+    );
 }
 
-pub type ParticleForceRegistry<'a> = Vec<(
-    &'a RefCell<Particle>,
-    &'a RefCell<dyn ParticleForceGenerator>
+pub type ParticleForceRegistry = Vec<(
+    ParticleKey,
+    Box<dyn ParticleForceGenerator>
 )>;
 
-pub fn update_forces(particle_force_registry: &ParticleForceRegistry, duration: f32) {
-    for (particle_cell, force_generator_cell) in particle_force_registry {
-        let mut particle = particle_cell.borrow_mut();
-        let force_generator = force_generator_cell.borrow();
-
-        force_generator.update_force(&mut particle, duration);
+pub fn update_forces(
+    particle_force_registry: &ParticleForceRegistry,
+    duration: f32,
+    particles: &mut ParticleMap
+) {
+    for (particle_key, force_generator) in particle_force_registry {
+        force_generator.update_force(*particle_key, duration, particles);
     }
 }
 
@@ -32,7 +38,8 @@ impl ParticleGravity {
 }
 
 impl ParticleForceGenerator for ParticleGravity {
-    fn update_force(&self, particle: &mut Particle, _duration: f32) {
+    fn update_force(&self, particle_key: ParticleKey, _duration: f32, particles: &mut ParticleMap) {
+        let particle = particles.get_mut(particle_key).unwrap();
         if particle.inverse_mass == 0. {
             return;
         }
@@ -53,7 +60,8 @@ impl ParticleDrag {
 }
 
 impl ParticleForceGenerator for ParticleDrag {
-    fn update_force(&self, particle: &mut Particle, _duration: f32) {
+    fn update_force(&self, particle_key: ParticleKey, _duration: f32, particles: &mut ParticleMap) {
+        let particle = particles.get_mut(particle_key).unwrap();
         let speed = particle.velocity.norm();
         let drag_coeff =
             self.k1 * speed +
@@ -64,14 +72,14 @@ impl ParticleForceGenerator for ParticleDrag {
     }
 }
 
-pub struct ParticleSpring<'a> {
-    pub other: &'a RefCell<Particle>,
+pub struct ParticleSpring {
+    pub other: ParticleKey,
     pub spring_constant: f32,
     pub rest_length: f32,
 }
 
-impl<'a> ParticleSpring<'a> {
-    pub fn new(other: &'a RefCell<Particle>, spring_constant: f32, rest_length: f32) -> Self {
+impl ParticleSpring {
+    pub fn new(other: ParticleKey, spring_constant: f32, rest_length: f32) -> Self {
         ParticleSpring { other, spring_constant, rest_length }
     }
 }
@@ -85,11 +93,13 @@ fn spring_force(p1: Vec3, p2: Vec3, rest_length: f32, spring_constant: f32) -> V
     force
 }
 
-impl ParticleForceGenerator for ParticleSpring<'_> {
-    fn update_force(&self, particle: &mut Particle, _duration: f32) {
+impl ParticleForceGenerator for ParticleSpring {
+    fn update_force(&self, particle_key: ParticleKey, _duration: f32, particles: &mut ParticleMap) {
+        let other_pos = particles[self.other].position;
+        let particle = particles.get_mut(particle_key).unwrap();
         particle.accumulated_force += spring_force(
             particle.position,
-            self.other.borrow().position,
+            other_pos,
             self.rest_length,
             self.spring_constant
         );
@@ -109,7 +119,8 @@ impl ParticleAnchoredSpring {
 }
 
 impl ParticleForceGenerator for ParticleAnchoredSpring {
-    fn update_force(&self, particle: &mut Particle, _duration: f32) {
+    fn update_force(&self, particle_key: ParticleKey, _duration: f32, particles: &mut ParticleMap) {
+        let particle = particles.get_mut(particle_key).unwrap();
         particle.accumulated_force += spring_force(
             particle.position,
             self.anchor,
@@ -132,7 +143,8 @@ impl<'a> ParticleBungee<'a> {
 }
 
 impl ParticleForceGenerator for ParticleBungee<'_> {
-    fn update_force(&self, particle: &mut Particle, _duration: f32) {
+    fn update_force(&self, particle_key: ParticleKey, _duration: f32, particles: &mut ParticleMap) {
+        let particle = particles.get_mut(particle_key).unwrap();
         let other = self.other.borrow();
         let to_other = particle.position - other.position;
         let dist = to_other.norm();
@@ -167,7 +179,8 @@ impl ParticelBuoyancy {
 }
 
 impl ParticleForceGenerator for ParticelBuoyancy {
-    fn update_force(&self, particle: &mut Particle, _duration: f32) {
+    fn update_force(&self, particle_key: ParticleKey, _duration: f32, particles: &mut ParticleMap) {
+        let particle = particles.get_mut(particle_key).unwrap();
         let depth = particle.position.y;
         let out_of_water = depth >= self.water_height + self.max_depth;
         if out_of_water {
@@ -201,7 +214,8 @@ impl ParticleFakeSpring {
 }
 
 impl ParticleForceGenerator for ParticleFakeSpring {
-    fn update_force(&self, particle: &mut Particle, duration: f32) {
+    fn update_force(&self, particle_key: ParticleKey, duration: f32, particles: &mut ParticleMap) {
+        let particle = particles.get_mut(particle_key).unwrap();
         if particle.inverse_mass == 0. {
             return;
         }
