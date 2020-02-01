@@ -1,4 +1,4 @@
-use crate::particle::{Particle, ParticleKey, ParticleMap};
+use crate::particle::{ParticleKey, ParticleMap};
 use crate::vec3::{Vec3, vec3};
 
 pub trait ParticleForceGenerator {

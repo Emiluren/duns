@@ -1,6 +1,7 @@
 pub mod particle;
 pub mod particle_contact;
 pub mod particle_force_generator;
+pub mod particle_world;
 pub mod vec3;
 
 #[cfg(test)]
