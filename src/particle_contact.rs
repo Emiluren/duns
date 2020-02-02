@@ -1,6 +1,7 @@
 use crate::particle::{ParticleKey, ParticleMap};
 use crate::vec3::{Vec3, vec3};
 
+#[derive(Debug)]
 pub struct ParticleContact {
     pub p1: ParticleKey,
     pub p2_opt: Option<ParticleKey>,
@@ -109,7 +110,8 @@ impl ParticleContactResolver {
 
         while self.iterations_used < self.iterations {
             let max_closing_opt = contacts.iter()
-                .filter(|c| c.calculate_separating_speed(particles) > 0.)
+                .filter(|c| c.calculate_separating_speed(particles) < 0. &&
+                        c.penetration > 0.)
                 .min_by(|c, c2| c.calculate_separating_speed(particles).partial_cmp(
                     &c2.calculate_separating_speed(particles)
                 ).unwrap());

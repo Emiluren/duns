@@ -41,17 +41,16 @@ impl ParticleWorld {
     }
 
     pub fn generate_contacts(&mut self) -> usize {
-        let mut i = 0;
+        self.contacts.clear();
         for gen in &self.contact_generators {
             if let Some(contact) = gen.add_contact(&self.particles) {
-                self.contacts[i] = contact;
-                i += 1;
-                if i >= self.contacts.len() {
+                self.contacts.push(contact);
+                if self.contacts.len() == self.contacts.capacity() {
                     break;
                 }
             }
         }
-        i
+        self.contacts.len()
     }
 
     pub fn integrate(&mut self, duration: f32) {
@@ -69,7 +68,7 @@ impl ParticleWorld {
 
         if num_contacts > 0 {
             self.resolver.resolve_contacts(
-                &self.contacts[0..num_contacts],
+                &self.contacts,
                 duration,
                 &mut self.particles
             );
