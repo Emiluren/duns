@@ -12,6 +12,9 @@ slotmap = "0.4.0"
 [[example]]
 name = "ballistic"
 
+[[example]]
+name = "sphere_plane"
+
 [dev-dependencies]
 sdl2 = "0.32.2"
 strum = "0.17.1"

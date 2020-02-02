@@ -212,3 +212,28 @@ impl ParticleContactGenerator for ParticleRod {
         })
     }
 }
+
+pub struct SpherePlane {
+    pub sphere_key: ParticleKey,
+    pub radius: f32,
+}
+
+impl ParticleContactGenerator for SpherePlane {
+    fn add_contact(
+        &self,
+        particles: &ParticleMap
+    ) -> Option<ParticleContact> {
+        let pos = particles[self.sphere_key].position;
+        if pos.y > self.radius {
+            return None;
+        }
+
+        Some(ParticleContact {
+            p1: self.sphere_key,
+            p2_opt: None,
+            restitution: 1.,
+            contact_normal: vec3(0., 1., 0.),
+            penetration: self.radius - pos.y
+        })
+    }
+}
