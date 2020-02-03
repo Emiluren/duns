@@ -3,12 +3,12 @@ use std::boxed::Box;
 use slotmap::DenseSlotMap;
 
 use crate::particle::ParticleMap;
-use crate::particle_contact::{
+use crate::particle::contact::{
     ParticleContact,
     ParticleContactGenerator,
     ParticleContactResolver,
 };
-use crate::particle_force_generator::ParticleForceRegistry;
+use crate::particle::force_generator::ParticleForceRegistry;
 use crate::vec3::vec3;
 
 pub struct ParticleWorld {

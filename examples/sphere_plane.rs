@@ -1,6 +1,6 @@
 use duns::particle::Particle;
-use duns::particle_contact;
-use duns::particle_world::ParticleWorld;
+use duns::particle::contact;
+use duns::particle::world::ParticleWorld;
 use duns::vec3::vec3;
 
 use sdl2::event::Event;
@@ -51,7 +51,7 @@ fn main() {
     sphere.set_mass(1.0);
 
     let sphere_radius = 0.5;
-    world.contact_generators.push(Box::new(particle_contact::SpherePlane{
+    world.contact_generators.push(Box::new(contact::SpherePlane{
         sphere_key, radius: sphere_radius
     }));
 
