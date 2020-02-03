@@ -2,9 +2,8 @@ pub mod contact;
 pub mod force_generator;
 pub mod world;
 
-use crate::vec3::{vec3, Vec3};
-
 use slotmap::{DenseSlotMap, new_key_type};
+use ultraviolet::vec::Vec3;
 
 #[derive(Clone)]
 pub struct Particle {
@@ -26,10 +25,10 @@ pub type ParticleMap = DenseSlotMap<ParticleKey, Particle>;
 impl Particle {
     pub fn new() -> Self {
         Particle {
-            position: vec3(0., 0., 0.),
-            velocity: vec3(0., 0., 0.),
-            acceleration: vec3(0., 0., 0.),
-            accumulated_force: vec3(0., 0., 0.),
+            position: Vec3::new(0., 0., 0.),
+            velocity: Vec3::new(0., 0., 0.),
+            acceleration: Vec3::new(0., 0., 0.),
+            accumulated_force: Vec3::new(0., 0., 0.),
 
             damping: 0.99,
             inverse_mass: 0.,
@@ -55,6 +54,6 @@ impl Particle {
         // Impose drag
         self.velocity *= self.damping.powf(duration);
 
-        self.accumulated_force = vec3(0., 0., 0.);
+        self.accumulated_force = Vec3::new(0., 0., 0.);
     }
 }

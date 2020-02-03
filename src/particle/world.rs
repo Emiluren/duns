@@ -1,6 +1,7 @@
 use std::boxed::Box;
 
 use slotmap::DenseSlotMap;
+use ultraviolet::vec::Vec3;
 
 use crate::particle::ParticleMap;
 use crate::particle::contact::{
@@ -9,7 +10,6 @@ use crate::particle::contact::{
     ParticleContactResolver,
 };
 use crate::particle::force_generator::ParticleForceRegistry;
-use crate::vec3::vec3;
 
 pub struct ParticleWorld {
     pub particles: ParticleMap,
@@ -36,7 +36,7 @@ impl ParticleWorld {
 
     pub fn start_frame(&mut self) {
         for particle in self.particles.values_mut() {
-            particle.accumulated_force = vec3(0., 0., 0.);
+            particle.accumulated_force = Vec3::new(0., 0., 0.);
         }
     }
 
