@@ -1,4 +1,5 @@
 use duns::particle::Particle;
+use duns::vec3::vec3;
 
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
@@ -7,7 +8,6 @@ use sdl2::rect::Rect;
 use std::time::{Duration, Instant};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
-use ultraviolet::vec::Vec3;
 
 pub fn modulo(x: i32, div: i32) -> i32 {
     (x % div + div) % div
@@ -26,7 +26,7 @@ struct Shot {
 }
 
 fn fire_shot(shot_type: ShotType) -> Shot {
-    let shooting_position = Vec3::new(0., 5., 0.);
+    let shooting_position = vec3(0., 5., 0.);
 
     let mut particle = Particle::new();
     particle.position = shooting_position;
@@ -34,24 +34,24 @@ fn fire_shot(shot_type: ShotType) -> Shot {
     match shot_type {
         ShotType::Pistol => {
             particle.set_mass(2.);
-            particle.velocity = Vec3::new(35., 0., 0.);
-            particle.acceleration = Vec3::new(0., -1., 0.);
+            particle.velocity = vec3(35., 0., 0.);
+            particle.acceleration = vec3(0., -1., 0.);
         },
         ShotType::Artillery => {
             particle.set_mass(200.);
-            particle.velocity = Vec3::new(40., 30., 0.); // 50 m/s
-            particle.acceleration = Vec3::new(0., -20., 0.);
+            particle.velocity = vec3(40., 30., 0.); // 50 m/s
+            particle.acceleration = vec3(0., -20., 0.);
         },
         ShotType::Fireball => {
             particle.set_mass(1.);
-            particle.velocity = Vec3::new(10., 0., 0.);
-            particle.acceleration = Vec3::new(0., 0.6, 0.);
+            particle.velocity = vec3(10., 0., 0.);
+            particle.acceleration = vec3(0., 0.6, 0.);
             particle.damping = 0.9;
         },
         ShotType::Laser => {
             particle.set_mass(0.1);
-            particle.velocity = Vec3::new(100., 0., 0.);
-            particle.acceleration = Vec3::new(0., 0., 0.);
+            particle.velocity = vec3(100., 0., 0.);
+            particle.acceleration = vec3(0., 0., 0.);
         },
     }
 

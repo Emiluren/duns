@@ -1,6 +1,5 @@
-use ultraviolet::vec::Vec3;
-
 use crate::particle::{ParticleKey, ParticleMap};
+use crate::vec3::{Vec3, vec3};
 
 #[derive(Debug)]
 pub struct ParticleContact {
@@ -15,7 +14,7 @@ impl ParticleContact {
     pub fn calculate_separating_speed(&self, particles: &ParticleMap) -> f32 {
         let p2_velocity = self.p2_opt
             .map(|p2| particles[p2].velocity)
-            .unwrap_or(Vec3::new(0., 0., 0.));
+            .unwrap_or(vec3(0., 0., 0.));
         let relative_velocity = particles[self.p1].velocity - p2_velocity;
 
         relative_velocity.dot(self.contact_normal)
@@ -35,7 +34,7 @@ impl ParticleContact {
 
         let acc_caused_velocity = particles[self.p1].acceleration +
             self.p2_opt.map(|p2| particles[p2].acceleration)
-            .unwrap_or(Vec3::new(0., 0., 0.));
+            .unwrap_or(vec3(0., 0., 0.));
         let acc_caused_sep_speed = acc_caused_velocity.dot(self.contact_normal) *
             duration;
 
@@ -144,7 +143,7 @@ pub struct ParticleLink {
 
 impl ParticleLink {
     fn current_length(&self, particles: &ParticleMap) -> f32 {
-        (particles[self.p1].position - particles[self.p2].position).mag()
+        (particles[self.p1].position - particles[self.p2].position).norm()
     }
 }
 
@@ -160,7 +159,7 @@ impl ParticleContactGenerator for ParticleLink {
         }
 
         let normal =
-            (particles[self.p2].position - particles[self.p1].position).normalized();
+            (particles[self.p2].position - particles[self.p1].position).normalize();
 
         Some(ParticleContact {
             p1: self.p1,
@@ -180,7 +179,7 @@ pub struct ParticleRod {
 
 impl ParticleRod {
     fn current_length(&self, particles: &ParticleMap) -> f32 {
-        (particles[self.p1].position - particles[self.p2].position).mag()
+        (particles[self.p1].position - particles[self.p2].position).norm()
     }
 }
 
@@ -196,7 +195,7 @@ impl ParticleContactGenerator for ParticleRod {
         }
 
         let normal =
-            (particles[self.p2].position - particles[self.p1].position).normalized();
+            (particles[self.p2].position - particles[self.p1].position).normalize();
 
         let (normal, penetration) = if current_length > self.length {
             (normal, current_length - self.length)
@@ -233,7 +232,7 @@ impl ParticleContactGenerator for SpherePlane {
             p1: self.sphere_key,
             p2_opt: None,
             restitution: 1.,
-            contact_normal: Vec3::new(0., 1., 0.),
+            contact_normal: vec3(0., 1., 0.),
             penetration: self.radius - pos.y
         })
     }

@@ -1,6 +1,5 @@
-use ultraviolet::vec::Vec3;
-
 use crate::particle::{ParticleKey, ParticleMap};
+use crate::vec3::{Vec3, vec3};
 
 pub trait ParticleForceGenerator {
     fn update_force(
@@ -61,7 +60,7 @@ impl ParticleDrag {
 impl ParticleForceGenerator for ParticleDrag {
     fn update_force(&self, particle_key: ParticleKey, _duration: f32, particles: &mut ParticleMap) {
         let particle = particles.get_mut(particle_key).unwrap();
-        let speed = particle.velocity.mag();
+        let speed = particle.velocity.norm();
         let drag_coeff =
             self.k1 * speed +
             self.k2 * speed * speed;
@@ -85,7 +84,7 @@ impl ParticleSpring {
 
 fn spring_force(p1: Vec3, p2: Vec3, rest_length: f32, spring_constant: f32) -> Vec3 {
     let to_other = p1 - p2;
-    let dist = to_other.mag();
+    let dist = to_other.norm();
     let force = to_other / dist *
         -(dist - rest_length).abs() *
         spring_constant;
@@ -146,7 +145,7 @@ impl ParticleForceGenerator for ParticleBungee {
         let other_pos = particles[self.other].position;
         let particle = particles.get_mut(particle_key).unwrap();
         let to_other = particle.position - other_pos;
-        let dist = to_other.mag();
+        let dist = to_other.norm();
 
         if dist <= self.rest_length {
             return;
@@ -188,9 +187,9 @@ impl ParticleForceGenerator for ParticelBuoyancy {
 
         let at_max_depth = depth <= self.water_height - self.max_depth;
         if at_max_depth {
-            particle.accumulated_force += Vec3::new(0., self.liquid_density * self.volume, 0.);
+            particle.accumulated_force += vec3(0., self.liquid_density * self.volume, 0.);
         } else {
-            particle.accumulated_force += Vec3::new(
+            particle.accumulated_force += vec3(
                 0.,
                 self.liquid_density * self.volume *
                     (depth - self.max_depth - self.water_height) / 2. * self.max_depth,

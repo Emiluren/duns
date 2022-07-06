@@ -1,13 +1,12 @@
 use duns::particle::Particle;
 use duns::particle::contact;
 use duns::particle::world::ParticleWorld;
+use duns::vec3::vec3;
 
 use sdl2::event::Event;
 use sdl2::pixels::Color;
 use sdl2::render::Canvas;
 use sdl2::video::Window;
-use ultraviolet::vec::Vec3;
-
 use std::time::Instant;
 
 fn draw_circle((px, py): (i32, i32), radius: f32, canvas: &mut Canvas<Window>) {
@@ -47,8 +46,8 @@ fn main() {
 
     let sphere_key = world.particles.insert(Particle::new());
     let mut sphere = world.particles.get_mut(sphere_key).unwrap();
-    sphere.position = Vec3::new(0., 5., 0.);
-    sphere.acceleration = Vec3::new(0., -10., 0.);
+    sphere.position = vec3(0., 5., 0.);
+    sphere.acceleration = vec3(0., -10., 0.);
     sphere.set_mass(1.0);
 
     let sphere_radius = 0.5;
