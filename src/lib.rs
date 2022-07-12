@@ -1,5 +1,5 @@
 pub mod particle;
-pub mod vec3;
+pub mod math;
 
 #[cfg(test)]
 mod tests {

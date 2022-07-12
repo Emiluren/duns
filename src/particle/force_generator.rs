@@ -1,5 +1,5 @@
 use crate::particle::{ParticleKey, ParticleMap};
-use crate::vec3::{Vec3, vec3};
+use crate::math::{Vec3, vec3};
 
 pub trait ParticleForceGenerator {
     fn update_force(

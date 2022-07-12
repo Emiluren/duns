@@ -1,7 +1,7 @@
 use duns::particle::Particle;
 use duns::particle::contact;
 use duns::particle::world::ParticleWorld;
-use duns::vec3::vec3;
+use duns::math::vec3;
 
 use sdl2::event::Event;
 use sdl2::pixels::Color;

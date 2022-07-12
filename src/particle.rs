@@ -2,7 +2,7 @@ pub mod contact;
 pub mod force_generator;
 pub mod world;
 
-use crate::vec3::{vec3, Vec3};
+use crate::math::{vec3, Vec3};
 
 use slotmap::{DenseSlotMap, new_key_type};
 

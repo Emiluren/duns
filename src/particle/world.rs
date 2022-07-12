@@ -9,7 +9,7 @@ use crate::particle::contact::{
     ParticleContactResolver,
 };
 use crate::particle::force_generator::ParticleForceRegistry;
-use crate::vec3::vec3;
+use crate::math::vec3;
 
 pub struct ParticleWorld {
     pub particles: ParticleMap,

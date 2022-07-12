@@ -1,5 +1,5 @@
 use crate::particle::{ParticleKey, ParticleMap};
-use crate::vec3::{Vec3, vec3};
+use crate::math::{Vec3, vec3};
 
 #[derive(Debug)]
 pub struct ParticleContact {
